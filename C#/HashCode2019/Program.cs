@@ -11,9 +11,11 @@ namespace HashCode2019
     class Program
     {
         public const int FileIndex = 4;
-        public const int MinSlideScore =25;
+        public const int MaxTasks = 40;
+        public const int SlidesPerTask = 500;
+        public static readonly int? MinSlideScore = null;
         public const bool UseMultipleThreads = true;
-        public static async Task  Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var allFilesLines = FileHelpers.GetFilesLines();
 
@@ -21,7 +23,7 @@ namespace HashCode2019
             var fileLines = allFilesLines[FileIndex];
             var assumption = AssumptionsHelpers.ExtractStatementAssumptions(fileLines);
             var photos = AssumptionsHelpers.ExtractPhotos(fileLines);
-            var slidesWithHorizontalPhotos = photos.Where(photo => photo.Orientation == "H").Select(photo=> new Slide(photo)).ToList();
+            var slidesWithHorizontalPhotos = photos.Where(photo => photo.Orientation == "H").Select(photo => new Slide(photo)).ToList();
             var slidesWithVerticalPhotos = AlgorithmHelpers.CreateSlidesFromVerticalPhotos(photos.Where(photo => photo.Orientation == "V").ToList());
             var sortedSlides = slidesWithHorizontalPhotos.Concat(slidesWithVerticalPhotos).OrderByDescending(slide => slide.TagsCount).ToList();
             //var sortedSlides = slidesWithHorizontalPhotos.Concat(slidesWithVerticalPhotos).ToList();
@@ -39,26 +41,27 @@ namespace HashCode2019
                 {
                     break;
                 }
-                if(UseMultipleThreads && sortedSlidesLen > 500)
+                if (UseMultipleThreads && sortedSlidesLen > SlidesPerTask)
                 {
-                    var chunks = AlgorithmHelpers.SplitList(sortedSlides, 500).ToList();
-                    var chunksToCount = chunks.Take(chunks.Count > 10 ? 10 : chunks.Count).ToList();
+                    var chunks = AlgorithmHelpers.SplitList(sortedSlides, SlidesPerTask).ToList();
+                    var chunksToCount = chunks.Take(chunks.Count > MaxTasks ? MaxTasks : chunks.Count).ToList();
                     if (sortedSlidesLen % 1000 == 0)
                     {
                         Console.WriteLine($"Chunks: {chunks.Count}");
-                        iterationWatch.Restart();
                     }
                     var tasks = new List<Task<Tuple<int, Slide>>>();
                     chunksToCount.ForEach(chunk => tasks.Add(AlgorithmHelpers.FindBestSildeInChunk(baseSlide, chunk, MinSlideScore)));
                     var tupleList = await Task.WhenAll(tasks.ToArray());
                     bestSlide = tupleList.OrderByDescending(slideTuple => slideTuple.Item1).FirstOrDefault().Item2;
-                } else
+                }
+                else
                 {
-                    bestSlide = (await AlgorithmHelpers.FindBestSildeInChunk(baseSlide, sortedSlides, MinSlideScore)).Item2;
+                    //bestSlide = (await AlgorithmHelpers.FindBestSildeInChunk(baseSlide, sortedSlides, MinSlideScore)).Item2;
+                    bestSlide = (await AlgorithmHelpers.FindBestSildeInChunk(baseSlide, sortedSlides.Take(sortedSlidesLen > SlidesPerTask * MaxTasks ? SlidesPerTask * MaxTasks : sortedSlidesLen).ToList(), MinSlideScore)).Item2;
                 }
                 slideShow.Add(bestSlide);
                 sortedSlides.Remove(bestSlide);
-                if (sortedSlidesLen%100 == 0)
+                if (sortedSlidesLen % 100 == 0)
                 {
                     Console.WriteLine($"Slides left: {sortedSlidesLen} elapsed seconds: {(float)iterationWatch.ElapsedMilliseconds / 1000}");
                     iterationWatch.Restart();

@@ -30,7 +30,7 @@ namespace HashCode2019.Functions
             pointsList.Add(slide2.TagsCount - pointsList[0]);
             return pointsList.Min();
         }
-        public static Task<Tuple<int,Slide>> FindBestSildeInChunk(Slide baseSlide, List<Slide> slides, int minScore)
+        public static Task<Tuple<int,Slide>> FindBestSildeInChunk(Slide baseSlide, List<Slide> slides, int? minScore)
         {
             return Task.Run(() => {
                 var bestScore = -1;
@@ -38,13 +38,13 @@ namespace HashCode2019.Functions
                 for (var i = 0; i < slides.Count; i = i + 1)
                 {
                     var slide = slides[i];
-                    var score = AlgorithmHelpers.CountScoreOfSlides(baseSlide, slide);
+                    var score = CountScoreOfSlides(baseSlide, slide);
                     if (score > bestScore)
                     {
                         bestScore = score;
                         bestSlide = slide;
                     }
-                    if (bestScore >= minScore)
+                    if (minScore.HasValue && bestScore >= minScore)
                     {
                         break;
                     }
