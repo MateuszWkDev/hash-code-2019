@@ -27,7 +27,7 @@ class PhotoDefinition:
 
 def getFilesLines(filesNumber)-> []:
     filesDataLines = []
-    statementsFolderPath = "C:\\HashCodeStatements2019\\"
+    statementsFolderPath = "..\\Statements\\"
     fileNames = [
         "a_example.txt",
         "b_lovely_landscapes.txt",
@@ -121,7 +121,8 @@ def createSlidesFromVertical(photos):
 def countTags(elem):
     return extractTagsFromSlide(elem).__len__()
 fileDataLines = getFilesLines(5)
-minScore=9
+#minScore=10 e- max
+minScore=4
 #for fileIndex, fileLines in enumerate(fileDataLines):
 
 fileIndex = 3
