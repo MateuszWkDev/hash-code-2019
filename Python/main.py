@@ -122,10 +122,10 @@ def countTags(elem):
     return extractTagsFromSlide(elem).__len__()
 fileDataLines = getFilesLines(5)
 #minScore=10 e- max
-minScore=4
+minScore=3
 #for fileIndex, fileLines in enumerate(fileDataLines):
 
-fileIndex = 3
+fileIndex = 1
 fileLines = fileDataLines[fileIndex]
 print(f'File Index: {fileIndex}')
 taskDefinition = getTaskDefinitions(fileLines)

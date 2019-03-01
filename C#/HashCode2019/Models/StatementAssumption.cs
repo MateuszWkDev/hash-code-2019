@@ -6,6 +6,10 @@ namespace HashCode2019.Models
 {
     public class StatementAssumption
     {
+        public StatementAssumption(int numberOfPhotos)
+        {
+            NumberOfPhotos = numberOfPhotos;
+        }
         public int NumberOfPhotos { get; set; }
     }
 }
