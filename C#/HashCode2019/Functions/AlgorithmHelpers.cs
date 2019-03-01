@@ -25,7 +25,9 @@ namespace HashCode2019.Functions
         public static int CountScoreOfSlides(Slide slide1, Slide slide2)
         {
             var pointsList = new List<int>();
-            pointsList.Add(slide1.Tags.Intersect(slide2.Tags).Count());
+            var temporarySet = new HashSet<string>(slide1.Tags);
+            temporarySet.IntersectWith(slide2.Tags);
+            pointsList.Add(temporarySet.Count());
             pointsList.Add(slide1.TagsCount - pointsList[0]);
             pointsList.Add(slide2.TagsCount - pointsList[0]);
             return pointsList.Min();

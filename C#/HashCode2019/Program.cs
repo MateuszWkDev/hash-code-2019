@@ -10,8 +10,8 @@ namespace HashCode2019
 {
     class Program
     {
-        public const int FileIndex = 4;
-        public const int MaxTasks = 40;
+        public const int FileIndex = 1;
+        public const int MaxTasks = 80;
         public const int SlidesPerTask = 500;
         public static readonly int? MinSlideScore = null;
         public const bool UseMultipleThreads = true;
