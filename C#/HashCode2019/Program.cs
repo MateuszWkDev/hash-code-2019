@@ -4,14 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HashCode2019
 {
     class Program
     {
-        public const int FileIndex = 1;
-        public const int MinSlideScore =3;
-        static void Main(string[] args)
+        public const int FileIndex = 4;
+        public const int MinSlideScore =25;
+        public const bool UseMultipleThreads = true;
+        public static async Task  Main(string[] args)
         {
             var allFilesLines = FileHelpers.GetFilesLines();
 
@@ -22,7 +24,7 @@ namespace HashCode2019
             var slidesWithHorizontalPhotos = photos.Where(photo => photo.Orientation == "H").Select(photo=> new Slide(photo)).ToList();
             var slidesWithVerticalPhotos = AlgorithmHelpers.CreateSlidesFromVerticalPhotos(photos.Where(photo => photo.Orientation == "V").ToList());
             var sortedSlides = slidesWithHorizontalPhotos.Concat(slidesWithVerticalPhotos).OrderByDescending(slide => slide.TagsCount).ToList();
-
+            //var sortedSlides = slidesWithHorizontalPhotos.Concat(slidesWithVerticalPhotos).ToList();
             var slideShow = new List<Slide>(){
                sortedSlides[0]
             };
@@ -30,27 +32,29 @@ namespace HashCode2019
             var iterationWatch = Stopwatch.StartNew();
             while (true)
             {
-                var bestScore = -1;
-                Slide bestSlide = null;
                 var sortedSlidesLen = sortedSlides.Count;
                 var baseSlide = slideShow.Last();
+                Slide bestSlide = null;
                 if (sortedSlidesLen == 0)
                 {
                     break;
                 }
-                for (var i = 0; i < sortedSlidesLen; i = i + 1)
+                if(UseMultipleThreads && sortedSlidesLen > 500)
                 {
-                    var slide = sortedSlides[i];
-                    var score = AlgorithmHelpers.CountScoreOfSlides(baseSlide, slide);
-                    if (score > bestScore)
+                    var chunks = AlgorithmHelpers.SplitList(sortedSlides, 500).ToList();
+                    var chunksToCount = chunks.Take(chunks.Count > 10 ? 10 : chunks.Count).ToList();
+                    if (sortedSlidesLen % 1000 == 0)
                     {
-                        bestScore = score;
-                        bestSlide = slide;
+                        Console.WriteLine($"Chunks: {chunks.Count}");
+                        iterationWatch.Restart();
                     }
-                    if(bestScore>= MinSlideScore)
-                    {
-                        break;
-                    }
+                    var tasks = new List<Task<Tuple<int, Slide>>>();
+                    chunksToCount.ForEach(chunk => tasks.Add(AlgorithmHelpers.FindBestSildeInChunk(baseSlide, chunk, MinSlideScore)));
+                    var tupleList = await Task.WhenAll(tasks.ToArray());
+                    bestSlide = tupleList.OrderByDescending(slideTuple => slideTuple.Item1).FirstOrDefault().Item2;
+                } else
+                {
+                    bestSlide = (await AlgorithmHelpers.FindBestSildeInChunk(baseSlide, sortedSlides, MinSlideScore)).Item2;
                 }
                 slideShow.Add(bestSlide);
                 sortedSlides.Remove(bestSlide);
