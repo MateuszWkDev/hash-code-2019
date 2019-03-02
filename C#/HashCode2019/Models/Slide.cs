@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace HashCode2019.Models
@@ -8,15 +9,15 @@ namespace HashCode2019.Models
     {
         public Slide(Photo photo1, Photo photo2 =null)
         {
-            Tags = new HashSet<string>();
-            photo1.Tags.ForEach(tag=> Tags.Add(tag));
+            var tags = new List<string>(photo1.Tags);
             Photos = new List<Photo>() { photo1 };
             
             if(photo2 != null)
             {
                 Photos.Add(photo2);
-                photo2.Tags.ForEach(tag => Tags.Add(tag));
+                tags.AddRange(photo2.Tags);
             }
+            Tags = new HashSet<string>(tags.Distinct().ToList());
             TagsCount = Tags.Count;
         }
         public List<Photo> Photos { get; set; }

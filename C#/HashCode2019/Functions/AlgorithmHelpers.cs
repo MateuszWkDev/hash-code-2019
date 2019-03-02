@@ -12,13 +12,17 @@ namespace HashCode2019.Functions
         public static List<Slide> CreateSlidesFromVerticalPhotos(List<Photo> verticalPhotos)
         {
             var slides = new List<Slide>();
-            if (verticalPhotos.Count==0)
+            var sortedPhotos = verticalPhotos.OrderByDescending(photo => photo.NumberOfTags).ToList();
+            while (true)
             {
-                return slides;
-            }
-            for (var i = 0; i<verticalPhotos.Count; i = i + 2)
-            {
-                slides.Add(new Slide(verticalPhotos[i], verticalPhotos[i + 1]));
+  
+                if (sortedPhotos.Count == 0)
+                {
+                    break;
+                }
+                slides.Add(new Slide(sortedPhotos.First(), sortedPhotos.Last()));
+                sortedPhotos.RemoveAt(0);
+                sortedPhotos.RemoveAt(sortedPhotos.Count - 1);
             }
             return slides;
         }
@@ -32,9 +36,10 @@ namespace HashCode2019.Functions
             pointsList.Add(slide2.TagsCount - pointsList[0]);
             return pointsList.Min();
         }
-        public static Task<Tuple<int,Slide>> FindBestSildeInChunk(Slide baseSlide, List<Slide> slides, int? minScore)
+        public static Task<Tuple<int, Slide>> FindBestSildeInChunk(Slide baseSlide, List<Slide> slides, int? minScore)
         {
-            return Task.Run(() => {
+            return Task.Run(() =>
+            {
                 var bestScore = -1;
                 Slide bestSlide = null;
                 for (var i = 0; i < slides.Count; i = i + 1)
@@ -52,13 +57,28 @@ namespace HashCode2019.Functions
                     }
                 }
                 return Tuple.Create(bestScore, bestSlide);
-            });                  
+            });
         }
         public static IEnumerable<List<T>> SplitList<T>(List<T> lists, int nSize = 5000)
         {
             for (int i = 0; i < lists.Count; i += nSize)
             {
                 yield return lists.GetRange(i, Math.Min(nSize, lists.Count - i));
+            }
+        }
+
+        private static Random rng = new Random();
+
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
             }
         }
     }

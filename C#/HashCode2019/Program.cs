@@ -10,11 +10,11 @@ namespace HashCode2019
 {
     class Program
     {
-        public const int FileIndex = 1;
-        public const int MaxTasks = 80;
+        public const int FileIndex = 3;
+        public const int MaxTasks = 40;
         public const int SlidesPerTask = 500;
         public static readonly int? MinSlideScore = null;
-        public const bool UseMultipleThreads = true;
+        public const bool UseMultipleThreads = false;
         public static async Task Main(string[] args)
         {
             var allFilesLines = FileHelpers.GetFilesLines();
@@ -68,7 +68,8 @@ namespace HashCode2019
                 }
             }
             FileHelpers.PrepareResults(slideShow, FileIndex);
-            Console.WriteLine($"Finished file {FileIndex} in {(float)wholeFileWatch.ElapsedMilliseconds / 1000}");
+            Console.WriteLine($"Finished file {FileIndex} in seconds: {(float)wholeFileWatch.ElapsedMilliseconds / 1000}");
+            Console.WriteLine($"Finished file {FileIndex} in minutes: {(float)wholeFileWatch.ElapsedMilliseconds / 60000}");
             Console.ReadLine();
         }
     }
