@@ -1,2 +1,2 @@
 # Hash Code 2019
-Google hashcode 2019 submission - Online Qualification Round
+Google hashcode 2019 Online Qualification Round task
