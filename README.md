@@ -1,1 +1,2 @@
-# hash-code-2019
+# Hash Code 2019
+Google hashcode 2019 submission
